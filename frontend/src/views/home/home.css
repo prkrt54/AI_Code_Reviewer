@@ -1,0 +1,267 @@
+.home {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  padding: 1rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.home-section {
+  max-width: 1500px;
+  margin: auto;
+}
+
+/* ================= Header ================= */
+
+.home-header {
+  background: #131c30;
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+  margin-bottom: 0.5rem;
+}
+
+.welcome h1 {
+  margin: 0;
+  font-size: 32px;
+  color: white;
+}
+
+.welcome span {
+  color: #6366f1;
+}
+
+.welcome p {
+  margin-top: 10px;
+  color: #7a8291;
+  font-size: 15px;
+}
+
+/* ================= Buttons ================= */
+
+.logout-btn,
+.new-project-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 12px 22px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.logout-btn {
+  background: #ef4444;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.new-project-btn {
+  background: #253b6b;
+}
+
+.new-project-btn:hover {
+  background: #28247d;
+  transform: translateY(-2px);
+}
+
+/* ================= Stats ================= */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  position: relative;
+  background: #131c30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  padding: 25px;
+  min-height: 150px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  transition: 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+}
+
+.folder-circle-1 {
+  position: absolute;
+  left: 25px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #3b82f6;
+}
+.stat-card-sub {
+  text-align: center;
+}
+
+.stat-card-sub h2 {
+  color: #3b82f6;
+  font-size: 38px;
+  margin-bottom: 8px;
+}
+
+.stat-card-sub p {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+/* ================= Action ================= */
+
+.top-action {
+  margin-bottom: 30px;
+}
+
+/* ================= Projects ================= */
+
+.projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 25px;
+}
+
+.project-card {
+  background: #131c30 !important;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+}
+
+.folder-circle {
+  width: 70px;
+
+  height: 70px;
+
+  margin: auto;
+
+  margin-bottom: 20px;
+
+  border-radius: 50%;
+
+  background: #eef2ff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 30px;
+
+  color: #6366f1;
+}
+
+.project-card h3 {
+  color: white;
+  margin-bottom: 10px;
+}
+
+.project-card p {
+  color: #8f9299 !important;
+  font-size: 14px;
+}
+
+/* ================= Empty State ================= */
+
+.empty-state {
+  background: white;
+  border-radius: 20px;
+  padding: 60px;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.empty-icon {
+  font-size: 70px;
+  color: #6366f1;
+  margin-bottom: 20px;
+}
+
+.empty-state h2 {
+  color: #111827;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin-bottom: 30px;
+}
+
+.empty-state button {
+  margin: auto;
+}
+
+/* ================= Responsive ================= */
+
+@media (max-width: 768px) {
+  .home {
+    padding: 1rem;
+  }
+
+  .home-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 20px;
+  }
+
+  .logout-btn {
+    width: 100%;
+
+    justify-content: center;
+  }
+
+  .new-project-btn {
+    width: 100%;
+
+    justify-content: center;
+  }
+
+  .projects {
+    grid-template-columns: 1fr;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .empty-state {
+    padding: 40px 20px;
+  }
+
+  .welcome h1 {
+    font-size: 26px;
+  }
+}
