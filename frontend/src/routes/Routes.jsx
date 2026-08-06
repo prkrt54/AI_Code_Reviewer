@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as AppRouter, Route, Routes as AppRoutes, Navigate } from 'react-router-dom'
+import { Route, Routes as AppRoutes, Navigate } from 'react-router-dom'
 import Home from '../views/home/Home'
 import CreateProject from '../views/create-project/CreateProject'
 import Project from '../views/project/Project'
@@ -15,15 +15,13 @@ function ProtectedRoute({ element }) {
 
 const Routes = () => {
     return (
-        <AppRouter>
-            <AppRoutes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/" element={<ProtectedRoute element={<Home />} />} />
-                <Route path="/create-project" element={<ProtectedRoute element={<CreateProject />} />} />
-                <Route path='/project/:id' element={<ProtectedRoute element={<Project />} />} />
-            </AppRoutes>
-        </AppRouter>
+    <AppRoutes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<ProtectedRoute element={<Home />} />} />
+        <Route path="/create-project" element={<ProtectedRoute element={<CreateProject />} />} />
+        <Route path="/project/:id" element={<ProtectedRoute element={<Project />} />} />
+    </AppRoutes>
     )
 }
 
