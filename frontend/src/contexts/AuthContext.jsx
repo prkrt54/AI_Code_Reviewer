@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:3000/auth/register", {
+      const response = await fetch("https://ai-code-reviewer-z3vr.onrender.com/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch("https://ai-code-reviewer-z3vr.onrender.com/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

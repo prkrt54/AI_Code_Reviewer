@@ -24,7 +24,7 @@ const Home = () => {
 
     useEffect(() => {
         axios
-            .get("http://localhost:3000/projects/get-all")
+            .get("https://ai-code-reviewer-z3vr.onrender.com/projects/get-all")
             .then((response) => {
                 setProjects(response.data.data);
             })

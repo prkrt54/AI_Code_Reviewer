@@ -18,7 +18,7 @@ const CreateProject = () => {
         try {
             setLoading(true);
 
-            await axios.post("http://localhost:3000/projects/create", {
+            await axios.post("https://ai-code-reviewer-z3vr.onrender.com/projects/create", {
                 projectName,
             });
 

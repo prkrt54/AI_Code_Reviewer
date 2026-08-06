@@ -45,7 +45,7 @@ const Project = () => {
     }
 
     useEffect(() => {
-        const io = SocketIo("http://localhost:3000", {
+        const io = SocketIo("https://ai-code-reviewer-z3vr.onrender.com", {
             auth: {
                 token: token
             },
