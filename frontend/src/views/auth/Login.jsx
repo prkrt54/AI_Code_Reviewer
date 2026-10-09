@@ -29,7 +29,12 @@ function Login() {
     return (
         <div className="auth-container">
             <div className="auth-box">
-                <h2>Login</h2>
+                <div className="auth-brand"><span>AI</span> Code Reviewer</div>
+                <div className="auth-heading">
+                    <p className="auth-eyebrow">Welcome back</p>
+                    <h2>Sign in to your workspace</h2>
+                    <p>Continue building better software with your team.</p>
+                </div>
                 {error && <div className="error-message">{error}</div>}
                 
                 <form onSubmit={handleSubmit}>

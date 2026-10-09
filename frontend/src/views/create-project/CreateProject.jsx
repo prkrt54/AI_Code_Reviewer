@@ -35,7 +35,7 @@ const CreateProject = () => {
 
             <section className="create-project-section">
 
-                <div className="project-card">
+                <div className="create-project-card">
 
                     <div className="project-icon">
 
@@ -43,6 +43,7 @@ const CreateProject = () => {
 
                     </div>
 
+                    <p className="create-eyebrow">Workspace setup</p>
                     <h1>Create New Project</h1>
 
                     <p>

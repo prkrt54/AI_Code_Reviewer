@@ -26,7 +26,7 @@ function Signup() {
 
         try {
             await register(name, email, password);
-            navigate('/login');
+            navigate('/');
         } catch (err) {
             setError(err.message || 'Signup failed');
         } finally {
@@ -37,7 +37,12 @@ function Signup() {
     return (
         <div className="auth-container">
             <div className="auth-box">
-                <h2>Sign Up</h2>
+                <div className="auth-brand"><span>AI</span> Code Reviewer</div>
+                <div className="auth-heading">
+                    <p className="auth-eyebrow">Get started</p>
+                    <h2>Create your workspace</h2>
+                    <p>Set up your account and bring your code reviews together.</p>
+                </div>
                 {error && <div className="error-message">{error}</div>}
                 
                 <form onSubmit={handleSubmit}>
