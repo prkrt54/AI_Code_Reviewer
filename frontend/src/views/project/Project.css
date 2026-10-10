@@ -30,7 +30,7 @@
 .project-section .chat::before {
     content: "Project chat";
     display: block;
-    height: 53px;
+    height: 23px;
     padding: 17px 18px;
     color: #172033;
     border-bottom: 1px solid #e9edf3;
@@ -52,16 +52,40 @@
 
 .project-section .chat .messages::-webkit-scrollbar { width: 5px; }
 .project-section .chat .messages::-webkit-scrollbar-thumb { background: #d7dce6; border-radius: 5px; }
+.project-section .chat .messages .message-row {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+}
+.project-section .chat .messages .message-row-own { justify-content: flex-end; }
+.project-section .chat .messages .message-row-other { justify-content: flex-start; }
 .project-section .chat .messages .message {
-    max-width: 88%;
+    max-width: 75%;
     width: fit-content;
     padding: 10px 12px;
-    margin-bottom: 10px;
-    border-radius: 4px 12px 12px 12px;
+    border-radius: 14px;
     color: #344054;
     background: #f1f3f8;
     font-size: 13px;
     line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+.project-section .chat .messages .message-row-own .message {
+    border-radius: 14px 4px 14px 14px;
+    background: #eeedff;
+    color: black;
+}
+.project-section .chat .messages .message-row-other .message {
+    border-radius: 4px 14px 14px 14px;
+    background: #635bff;
+    color: white;
+}
+.project-section .chat .messages .message-sender {
+    display: block;
+    margin-bottom: 3px;
+    color: #635bff;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .project-section .chat .input-area {

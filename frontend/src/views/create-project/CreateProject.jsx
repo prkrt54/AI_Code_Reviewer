@@ -3,12 +3,16 @@ import "./CreateProject.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaFolderPlus, FaArrowLeft } from "react-icons/fa";
+import { useAuth } from "../../contexts/AuthContext";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const CreateProject = () => {
     const [projectName, setProjectName] = useState("");
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const { token } = useAuth();
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -18,8 +22,12 @@ const CreateProject = () => {
         try {
             setLoading(true);
 
-            await axios.post("https://ai-code-reviewer-z3vr.onrender.com/projects/create", {
+            await axios.post(`${API_BASE_URL}/projects/create`, {
                 projectName,
+            }, {
+                headers: {
+                    Authorization: ["Bearer", token].join(" "),
+                },
             });
 
             navigate("/");

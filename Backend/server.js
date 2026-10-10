@@ -28,7 +28,7 @@ process.on('SIGINT', () => {
 
 
 // Socket authentication middleware
-io.use((socket, next) => {
+io.use(async (socket, next) => {
     try {
         const token = socket.handshake.auth.token;
         
@@ -39,39 +39,95 @@ io.use((socket, next) => {
         const decoded = verifyToken(token);
         socket.userId = decoded.userId;
         socket.userEmail = decoded.email;
+
+        const project = socket.handshake.query.project;
+        const authorizedProject = await getAuthorizedProject(project, socket.userId);
+        if (!authorizedProject) {
+            console.warn("Socket project authorization denied", {
+                userId: socket.userId,
+                projectId: project
+            });
+            return next(new Error('Project access denied'));
+        }
+
+        socket.projectId = project;
         
         next();
     } catch (error) {
+        console.error("Socket authentication or authorization failed:", error.message);
         next(new Error('Invalid token: ' + error.message));
     }
 });
 
+async function getAuthorizedProject(projectId, userId) {
+    return projectModel.findOne({
+        _id: projectId,
+        $or: [
+            { owner: userId },
+            { members: userId }
+        ]
+    }).select("_id");
+}
 
 io.on('connection', (socket) => {
 
-    console.log('New client connected:', socket.userId);
+    console.log('New client connected to project', {
+        userId: socket.userId,
+        projectId: socket.projectId
+    });
 
-
-    const project = socket.handshake.query.project
+    const project = socket.projectId;
     socket.join(project)
 
     socket.on('disconnect', () => {
-        console.log('Client disconnected');
+        console.log('Client disconnected from project', {
+            userId: socket.userId,
+            projectId: project
+        });
     });
 
 
     socket.on('chat-history', async () => {
+        console.log("Chat history requested", {
+            userId: socket.userId,
+            projectId: project
+        });
         try {
+            const authorizedProject = await getAuthorizedProject(project, socket.userId);
+            if (!authorizedProject) {
+                console.warn("Chat history authorization denied", {
+                    userId: socket.userId,
+                    projectId: project
+                });
+                return socket.emit("error", "Project not found");
+            }
+
             const messages = await messageModel.find({ project: project })
+                .sort({ createdAt: 1 });
+            console.log("Chat history returned", {
+                userId: socket.userId,
+                projectId: project,
+                messageCount: messages.length
+            });
             socket.emit("chat-history", messages)
         } catch (error) {
+            console.error("Chat history failed:", error.message);
             socket.emit("error", error.message)
         }
     })
 
     socket.on("get-project-code", async () => {
         try {
-            const projectData = await projectModel.findById(project).select("code")
+            const projectData = await projectModel.findOne({
+                _id: project,
+                $or: [
+                    { owner: socket.userId },
+                    { members: socket.userId }
+                ]
+            }).select("code")
+            if (!projectData) {
+                return socket.emit("error", "Project not found")
+            }
             socket.emit("project-code", projectData.code)
         } catch (error) {
             socket.emit("error", error.message)
@@ -80,12 +136,22 @@ io.on('connection', (socket) => {
 
     socket.on("chat-message", async message => {
         try {
-            socket.broadcast.to(project).emit("chat-message", message)
-            await messageModel.create({
+            const authorizedProject = await getAuthorizedProject(project, socket.userId);
+            if (!authorizedProject) {
+                return socket.emit("error", "Project not found");
+            }
+
+            if (typeof message !== "string" || !message.trim()) {
+                return socket.emit("error", "Message text is required");
+            }
+
+            const savedMessage = await messageModel.create({
                 project: project,
-                text: message,
+                text: message.trim(),
                 user: socket.userId
-            })
+            });
+
+            io.to(project).emit("chat-message", savedMessage);
         } catch (error) {
             socket.emit("error", error.message)
         }
@@ -94,7 +160,16 @@ io.on('connection', (socket) => {
     socket.on('code-change', async (code) => {
         try {
             socket.broadcast.to(project).emit('code-change', code)
-            await projectModel.findOneAndUpdate({ _id: project }, { code: code })
+            await projectModel.findOneAndUpdate(
+                {
+                    _id: project,
+                    $or: [
+                        { owner: socket.userId },
+                        { members: socket.userId }
+                    ]
+                },
+                { code: code }
+            )
         } catch (error) {
             socket.emit("error", error.message)
         }

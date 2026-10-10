@@ -7,6 +7,15 @@ const projectSchema = new mongoose.Schema({
         type: String,
         required: [ true, 'Project name is required' ],
     },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [ true, 'Project owner is required' ],
+    },
+    members: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
     code: {
         type: String,
         default: ""

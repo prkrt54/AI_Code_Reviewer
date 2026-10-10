@@ -6,12 +6,18 @@ import { GoGraph } from "react-icons/go";
 import { useAuth } from "../../contexts/AuthContext";
 import "./home.css";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const Home = () => {
     const navigate = useNavigate();
-    const { logout, user } = useAuth();
+    const { logout, user, token } = useAuth();
     console.log(user);
 
     const [projects, setProjects] = useState([]);
+    const [invitations, setInvitations] = useState([]);
+    const [inviteEmails, setInviteEmails] = useState({});
+    const [invitationMessages, setInvitationMessages] = useState({});
+    const [inviteMessages, setInviteMessages] = useState({});
 
     function navigateToProject(projectId) {
         navigate(`/project/${projectId}`);
@@ -22,16 +28,84 @@ const Home = () => {
         navigate("/login");
     }
 
+    async function loadInvitations() {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/projects/invitations/pending`, {
+                headers: {
+                    Authorization: ["Bearer", token].join(" "),
+                },
+            });
+            setInvitations(response.data.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function updateInvitation(invitationId, status) {
+        try {
+            await axios.patch(`${API_BASE_URL}/projects/invitations/${invitationId}`, { status }, {
+                headers: {
+                    Authorization: ["Bearer", token].join(" "),
+                },
+            });
+            await loadInvitations();
+            if (status === "accepted") {
+                const response = await axios.get(`${API_BASE_URL}/projects/get-all`, {
+                    headers: {
+                        Authorization: ["Bearer", token].join(" "),
+                    },
+                });
+                setProjects(response.data.data);
+            }
+            setInvitationMessages((previous) => ({
+                ...previous,
+                [invitationId]: `Invitation ${status}`,
+            }));
+        } catch (error) {
+            setInvitationMessages((previous) => ({
+                ...previous,
+                [invitationId]: error.response?.data?.message || "Unable to update invitation",
+            }));
+        }
+    }
+
+    async function inviteUser(projectId) {
+        try {
+            await axios.post(`${API_BASE_URL}/projects/${projectId}/invitations`, {
+                email: inviteEmails[projectId] || "",
+            }, {
+                headers: {
+                    Authorization: ["Bearer", token].join(" "),
+                },
+            });
+            setInviteEmails((previous) => ({ ...previous, [projectId]: "" }));
+            setInviteMessages((previous) => ({
+                ...previous,
+                [projectId]: "Invitation sent",
+            }));
+        } catch (error) {
+            setInviteMessages((previous) => ({
+                ...previous,
+                [projectId]: error.response?.data?.message || "Unable to send invitation",
+            }));
+        }
+    }
+
     useEffect(() => {
         axios
-            .get("https://ai-code-reviewer-z3vr.onrender.com/projects/get-all")
+            .get(`${API_BASE_URL}/projects/get-all`, {
+                headers: {
+                    Authorization: ["Bearer", token].join(" "),
+                },
+            })
             .then((response) => {
                 setProjects(response.data.data);
             })
             .catch((error) => {
                 console.log(error);
             });
-    }, []);
+        loadInvitations();
+    }, [token]);
 
     return (
         <main className="home">
@@ -102,6 +176,31 @@ const Home = () => {
 
                 <div className="workspace-grid">
                     <section className="projects-panel">
+                        {invitations.length > 0 && (
+                            <div className="invitations-panel">
+                                <div className="section-heading">
+                                    <div>
+                                        <p className="eyebrow">Shared with you</p>
+                                        <h2>Pending invitations</h2>
+                                    </div>
+                                </div>
+                                {invitations.map((invitation) => (
+                                    <div className="invitation-row" key={invitation._id}>
+                                        <div>
+                                            <strong>{invitation.project?.name || "Project"}</strong>
+                                            <span>Invited by {invitation.inviter?.name || invitation.inviter?.email}</span>
+                                        </div>
+                                        <div className="invitation-actions">
+                                            <button type="button" onClick={() => updateInvitation(invitation._id, "accepted")}>Accept</button>
+                                            <button type="button" onClick={() => updateInvitation(invitation._id, "rejected")}>Reject</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {Object.entries(invitationMessages).map(([invitationId, message]) => (
+                            <p className="invitation-message" key={invitationId}>{message}</p>
+                        ))}
                         <div className="section-heading">
                             <div>
                                 <p className="eyebrow">Workspace library</p>
@@ -158,6 +257,26 @@ const Home = () => {
                                             <span className="project-status"><i></i> Project workspace</span>
                                             <span className="card-dots">•••</span>
                                         </div>
+                                        {String(project.owner) === String(user?.id) && (
+                                            <div
+                                                className="invite-control"
+                                                onClick={(event) => event.stopPropagation()}
+                                            >
+                                                <input
+                                                    type="email"
+                                                    placeholder="Teammate email"
+                                                    value={inviteEmails[project._id] || ""}
+                                                    onChange={(event) => setInviteEmails((previous) => ({
+                                                        ...previous,
+                                                        [project._id]: event.target.value,
+                                                    }))}
+                                                />
+                                                <button type="button" onClick={() => inviteUser(project._id)}>Invite</button>
+                                                {inviteMessages[project._id] && (
+                                                    <p className="invitation-message">{inviteMessages[project._id]}</p>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>

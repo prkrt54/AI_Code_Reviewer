@@ -110,6 +110,15 @@ button:focus-visible, .project-card:focus-visible { outline: 3px solid rgba(99,9
 
 .workspace-grid { display: block; }
 .projects-panel { min-width: 0; }
+.invitations-panel { margin-bottom: 24px; padding: 18px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+.invitation-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid #f0f2f6; }
+.invitation-row strong, .invitation-row span { display: block; }
+.invitation-row strong { color: var(--ink); font-size: 13px; }
+.invitation-row span { margin-top: 4px; color: var(--muted); font-size: 11px; }
+.invitation-actions { display: flex; gap: 8px; }
+.invitation-actions button, .invite-control button { padding: 7px 10px; border: 0; border-radius: 7px; color: #fff; background: var(--accent); font-size: 11px; font-weight: 700; cursor: pointer; }
+.invitation-actions button:last-child { color: var(--muted); background: #eef0f5; }
+.invitation-message { margin-top: 10px; color: var(--muted); font-size: 11px; }
 .section-heading h2 { color: var(--ink); font: 600 21px 'Space Grotesk', sans-serif; letter-spacing: -.6px; margin-top: 6px; }
 .card-dots { color: #aab1bf; letter-spacing: 2px; font-size: 11px; }
 
@@ -121,9 +130,13 @@ button:focus-visible, .project-card:focus-visible { outline: 3px solid rgba(99,9
 .project-card-header { display: flex; align-items: flex-start; justify-content: space-between; }.folder-circle { width: 43px; height: 43px; display: grid; place-items: center; border-radius: 11px; color: var(--accent); background: #eeedff; font-size: 17px; }.project-arrow { color: #b0b6c4; font-size: 19px; transition: transform .2s, color .2s; }.project-card:hover .project-arrow { color: var(--accent); transform: translate(2px, -2px); }
 .project-card-content { margin-top: 18px; }.project-label { color: var(--soft); font-size: 9px; font-weight: 700; letter-spacing: .14em; }.project-card h3 { overflow: hidden; color: var(--ink); font: 600 17px 'Space Grotesk', sans-serif; text-overflow: ellipsis; white-space: nowrap; margin: 7px 0 5px; }.project-card-content p { color: var(--muted); font-size: 11px; }
 .project-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 17px; padding-top: 12px; border-top: 1px solid #f0f2f6; }.project-status { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; }.project-status i { width: 5px; height: 5px; box-shadow: none; }
+.invite-control { width: 100%; min-width: 0; display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f0f2f6; box-sizing: border-box; }
+.invite-control input { min-width: 0; flex: 1 1 auto; width: 0; height: 32px; padding: 0 9px; border: 1px solid var(--line); border-radius: 7px; outline: 0; color: var(--ink); background: #fbfcfe; font: inherit; font-size: 11px; box-sizing: border-box; }
+.invite-control input:focus { border-color: #aaa5ff; box-shadow: 0 0 0 3px rgba(99,91,255,.1); }
+.invite-control button { width: 68px; min-width: 68px; height: 32px; padding: 0 8px; flex: 0 0 68px; }
 
 .empty-state { min-height: 310px; display: flex; align-items: center; justify-content: center; gap: 38px; padding: 35px; border: 1px dashed #cbd2df; border-radius: 15px; background: #fff; }.empty-illustration { position: relative; width: 120px; height: 120px; display: grid; place-items: center; border-radius: 50%; background: #f4f3ff; }.empty-folder { width: 59px; height: 48px; display: grid; place-items: center; border-radius: 12px; color: var(--accent); background: #fff; box-shadow: 0 9px 18px rgba(99,91,255,.14); font-size: 24px; }.empty-spark { position: absolute; color: #8d87ff; font: 700 20px 'Space Grotesk', sans-serif; }.spark-one { top: 18px; right: 23px; }.spark-two { bottom: 19px; left: 24px; }.empty-state h2 { color: var(--ink); font: 600 22px 'Space Grotesk', sans-serif; margin: 7px 0 7px; }.empty-state p:not(.eyebrow) { color: var(--muted); font-size: 13px; margin-bottom: 19px; }
 
 @media (max-width: 900px) { .nav-context { display: none; }.dashboard-intro { padding: 40px; }.hero-visual { width: 310px; transform: scale(.85); transform-origin: right center; margin-right: -28px; }.projects-panel { width: 100%; } }
 @media (max-width: 620px) { .home { padding: 0 15px 45px; }.top-nav { height: 68px; }.workspace-status, .profile-name { display: none; }.profile-chip { padding-left: 0; border-left: 0; }.logout-btn { min-height: 36px; padding: 0 10px; }.logout-btn span { display: none; }.dashboard-intro { min-height: 390px; align-items: flex-start; padding: 33px 25px; margin-top: 18px; }.welcome h1 { font-size: 40px; letter-spacing: -1.8px; }.hero-visual { position: absolute; bottom: -34px; right: -25px; transform: scale(.85); opacity: .8; }.section-heading { min-height: 0; align-items: stretch; flex-direction: column; }.section-heading .new-project-btn { width: 100%; }.empty-state { flex-direction: column; text-align: center; gap: 20px; padding: 42px 20px; }.empty-illustration { width: 105px; height: 105px; } }
-@media (max-width: 390px) { .brand-lockup small { display: none; }.dashboard-intro { min-height: 410px; }.welcome h1 { font-size: 35px; }.hero-copy { font-size: 13px; } }
+@media (max-width: 390px) { .brand-lockup small { display: none; }.dashboard-intro { min-height: 410px; }.welcome h1 { font-size: 35px; }.hero-copy { font-size: 13px; }.invite-control { flex-wrap: wrap; }.invite-control input { flex-basis: calc(100% - 76px); }.invite-control button { flex-basis: 68px; } }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { io as SocketIo } from "socket.io-client"
 import Editor from '@monaco-editor/react'
@@ -6,34 +6,50 @@ import ReactMarkdown from 'react-markdown'
 import { useAuth } from '../../contexts/AuthContext'
 import "./Project.css"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const Project = () => {
     const prams = useParams()
-    const { token } = useAuth()
+    const { token, user } = useAuth()
     const [ messages, setMessages ] = useState([])
     const [ input, setInput ] = useState("")
-    const [ socket, setSocket ] = useState(null)
+    const [ chatLoading, setChatLoading ] = useState(true)
+    const [ chatError, setChatError ] = useState("")
+    const socketRef = useRef(null)
     const [ code, setCode ] = useState("// Write your code here...\n")
     const [ language, setLanguage ] = useState("javascript")
     const [ review, setReview ] = useState("*No review yet. Click 'get-review' to generate a code review.*")
+    const currentUserId = user?.id || user?._id
+    const visibleMessages = messages.filter((message) => {
+        const text = typeof message === "string" ? message : message?.text
+        return typeof text === "string"
+            && !text.startsWith("__history_fix_")
+            && !text.startsWith("__chat_member_")
+    })
+
+    function getMessageSenderId(message) {
+        const sender = message?.user
+        if (typeof sender === "string") return sender
+        if (sender && typeof sender === "object") return sender._id || sender.id
+        return null
+    }
 
     // Function to handle code changes from the editor
     function handleEditorChange(value) {
         setCode(value)
-        socket.emit("code-change", value)
+        socketRef.current?.emit("code-change", value)
     }
 
     function handleUserMessage() {
-        setMessages((prev) => {
-            return [ ...prev, input ]
-        })
-        socket.emit("chat-message", input)
+        if (!input.trim()) return
+        socketRef.current?.emit("chat-message", input)
         setInput("")
     }
 
     function getReview() {
-        if (socket) {
+        if (socketRef.current) {
             setReview(" Generating review...")
-            socket.emit("get-review", code)
+            socketRef.current.emit("get-review", code)
         } else {
             setReview(" Socket not connected yet. Please wait...")
         }
@@ -45,7 +61,7 @@ const Project = () => {
     }
 
     useEffect(() => {
-        const io = SocketIo("https://ai-code-reviewer-z3vr.onrender.com", {
+        const io = SocketIo(API_BASE_URL, {
             auth: {
                 token: token
             },
@@ -54,11 +70,13 @@ const Project = () => {
             }
         })
 
-
-        io.emit("chat-history")
-
         io.on('chat-history', (messages) => {
-            setMessages(messages.map((message) => message.text))
+            console.log("Chat history received", {
+                projectId: prams.id,
+                messageCount: Array.isArray(messages) ? messages.length : 0
+            })
+            setMessages(messages)
+            setChatLoading(false)
         })
 
         io.on('chat-message', (message) => {
@@ -79,10 +97,45 @@ const Project = () => {
             console.log(review)
             setReview(review)
         })
-        io.emit("get-project-code")
 
-        setSocket(io)
-    }, [])
+        io.on("error", (error) => {
+            console.error("Project chat error:", error)
+            setChatLoading(false)
+            setChatError(typeof error === "string" ? error : "Unable to load project chat")
+        })
+
+        io.on("connect_error", (error) => {
+            console.error("Project chat connection error:", error.message)
+            setChatLoading(false)
+            setChatError("Unable to connect to project chat")
+        })
+
+        io.on("connect", () => {
+            console.log("Project chat connected", { projectId: prams.id })
+            setChatError("")
+            console.log("Requesting chat history", { projectId: prams.id })
+            io.emit("chat-history")
+            io.emit("get-project-code")
+        })
+
+        io.on("disconnect", (reason) => {
+            if (reason !== "io client disconnect") {
+                console.warn("Project chat disconnected:", reason)
+                setChatLoading(false)
+                setChatError("Project chat disconnected")
+            }
+        })
+
+        socketRef.current = io
+
+        return () => {
+            io.removeAllListeners()
+            io.disconnect()
+            if (socketRef.current === io) {
+                socketRef.current = null
+            }
+        }
+    }, [token, prams.id])
 
     return (
         <main className='project-main' >
@@ -90,15 +143,33 @@ const Project = () => {
                 <div className="chat">
 
                     <div className="messages">
-                        {
-                            messages.map((message, index) => {
-                                return (<div className="message" key={index}>
-                                    <span>
-                                        {message}
-                                    </span>
+                        {chatLoading && <div className="message">Loading messages...</div>}
+                        {!chatLoading && chatError && <div className="message">{chatError}</div>}
+                        {!chatLoading && !chatError && visibleMessages.length === 0 && (
+                            <div className="message">No messages yet.</div>
+                        )}
+                        {!chatLoading && !chatError && (
+                            visibleMessages.map((message, index) => {
+                                const text = typeof message === "string" ? message : message.text
+                                const senderId = getMessageSenderId(message)
+                                const isOwnMessage = Boolean(currentUserId && senderId
+                                    && String(currentUserId) === String(senderId))
+                                const sender = message?.user
+                                const senderName = !isOwnMessage && sender && typeof sender === "object"
+                                    ? sender.name
+                                    : null
+
+                                return (<div
+                                    className={`message-row ${isOwnMessage ? "message-row-own" : "message-row-other"}`}
+                                    key={message?._id || `${message?.createdAt || text}-${index}`}
+                                >
+                                    <div className="message">
+                                        {senderName && <span className="message-sender">{senderName}</span>}
+                                        <span>{text}</span>
+                                    </div>
                                 </div>)
                             })
-                        }
+                        )}
                     </div>
 
                     <div className="input-area">

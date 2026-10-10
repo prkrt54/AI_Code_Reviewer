@@ -7,6 +7,11 @@ const messageSchema = new mongoose.Schema({
         ref: 'Project',
         required: [ true, 'Project is required' ],
     },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [ true, 'Message sender is required' ],
+    },
     text: {
         type: String,
         required: [ true, 'Message text is required' ],
