@@ -22,6 +22,11 @@ function Signup() {
             return;
         }
 
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -75,6 +80,7 @@ function Signup() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            minLength={6}
                             placeholder="Enter password (min 6 chars)"
                         />
                     </div>

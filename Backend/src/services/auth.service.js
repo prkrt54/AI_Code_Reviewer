@@ -8,8 +8,24 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_EXPIRE = '7d';
 
+export function validateRegistrationPassword(password) {
+    if (password === undefined || password === null || password === '') {
+        throw new Error('Password is required');
+    }
+
+    if (typeof password !== 'string') {
+        throw new Error('Password must be a string');
+    }
+
+    if (password.length < 6) {
+        throw new Error('Password must be at least 6 characters');
+    }
+}
+
 export async function registerUser(name, email, password) {
     try {
+        validateRegistrationPassword(password);
+
         // Check if user already exists
         const existingUser = await userModel.findOne({ email });
         if (existingUser) {

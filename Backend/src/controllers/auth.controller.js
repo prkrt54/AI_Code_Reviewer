@@ -1,12 +1,14 @@
-import { registerUser, loginUser } from '../services/auth.service.js';
+import { registerUser, loginUser, validateRegistrationPassword } from '../services/auth.service.js';
 
 export async function register(req, res) {
     try {
         const { name, email, password } = req.body;
 
-        if (!name || !email || !password) {
+        if (!name || !email) {
             return res.status(400).json({ message: 'Please provide name, email, and password' });
         }
+
+        validateRegistrationPassword(password);
 
         const result = await registerUser(name, email, password);
         
